@@ -1,0 +1,22 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+#CORS
+OPTIONS        /                                           controllers.Application.rootOptions()
+OPTIONS        /*url                                       controllers.Application.options(url:String)
+
+# Home page
+GET            /                                           controllers.Application.index()
+
+# Example
+GET            /services/examples/list        @spy.social.controllers.ExampleServices.getExampleList()
+GET            /services/examples/:id        @spy.social.controllers.ExampleServices.getExampleDetail(id: Long)
+POST           /services/examples/add        @spy.social.controllers.ExampleServices.addExample()
+POST           /services/examples/deleteall        @spy.social.controllers.ExampleServices.deleteAllExamples()
+
+# Map static resources from the /public folder to the /assets URL path
+GET            /app/*file                                  controllers.Assets.at(path="/public", file)
+GET            /assets/*file                               controllers.Assets.at(path="/public", file)
+
+    

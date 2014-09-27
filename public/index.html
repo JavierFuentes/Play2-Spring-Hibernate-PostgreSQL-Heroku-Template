@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es" xml:lang="es" xmlns="http://www.w3.org/1999/html" ng-app="app" ng-controller="appCtrl"
+      xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Example</title>
+    <meta name="author" content="Javier Fuentes">
+    <link rel="icon" href="./images/muro1.jpg">
+    <link rel="stylesheet" href="./stylesheets/bootstrap.css"/>
+
+    <script src="./javascripts/myUtilities.js"></script>
+</head>
+
+<body>
+
+<div class="text-center text-success col-xs-12">
+    <img src="./images/muro1.jpg" height="120"/>
+
+    <h1>
+        Play-Spring-Hibernate-Example Server
+        <br>
+        is running...
+    </h1>
+
+    <script>
+        document.write(companyData.getCopyright())
+    </script>
+</div>
+
+<div class="col-xs-4"></div>
+<div class="col-xs-4 text-center">
+
+    <form name="frmNewName" ng-submit="addName()">
+        <table class="text-center col-xs-12">
+            <tr class="row">
+                <td>
+                    <label for="txtName">New name:</label>
+                    <input id="txtName" type="text" maxlength="255" ng-model="newname"/>
+                </td>
+                <td>
+                    <button class="btn btn-primary btn-sm" ng-disabled="(!newname) || (isloading)">
+                        Add
+                    </button>
+                    <p></p>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <p></p>
+    <button class="btn btn-primary btn-block" ng-disabled="isloading" ng-click="deleteAllData()">
+        Delete All Data
+    </button>
+    <p></p>
+
+    <table class="table table-bordered">
+        <tr>
+            <th class="text-center">Id</th>
+            <th class="text-center">Name</th>
+        </tr>
+
+        <tr class="text-center" ng-repeat="example in json_data track by $index">
+            <td>{{example.id}}</td>
+            <td>{{example.name}}</td>
+        </tr>
+    </table>
+
+</div>
+<div class="col-xs-4"></div>
+
+</body>
+</html>
+
+<!------------------------------------- SCRIPTS ---------------------------------------------->
+<script src="./js-lib/jquery-2.1.1/jquery-2.1.1.js"></script>
+
+<script src="./js-lib/bootstrap-3.1.1-dist/js/bootstrap.js"></script>
+
+<script src="./js-lib/angular-1.2.17/angular.js"></script>
+<script src="./js-lib/angular-1.2.17/angular-route.js"></script>
+
+<script type="application/javascript">
+    angular.module('app', [])
+            .controller('appCtrl', function ($scope, $http, $location) {
+
+                $scope.newname = '';
+                $scope.isloading = false;
+
+                //'http://localhost:9000'
+                var ServerURL = $location.$$protocol + '://' + $location.$$host;
+                if ($location.$$port)
+                    ServerURL += ':' + $location.$$port;
+
+                $scope.addName = function () {
+                    var json_newRecord = {
+                        data_name: $scope.newname
+                    };
+
+                    $http.post(ServerURL + '/services/examples/add', json_newRecord)
+                            .then(function (Response) {
+                                $scope.newname = '';
+                                $scope.loadData();
+                            });
+                };
+
+                $scope.loadData = function () {
+                    $scope.isloading = true;
+                    $scope.json_data = {};
+
+                    $http.get(ServerURL + '/services/examples/list')
+                            .then(function (Response) {
+                                $scope.json_data = Response.data;
+                            })
+                            .catch(function (Response) {
+                                console.log("$http Response : ", Response);
+                            })
+                            .finally(function () {
+                                $scope.isloading = false;
+                            })
+                };
+                $scope.loadData();  // Automatic reload
+
+                $scope.deleteAllData = function () {
+                    $http.post(ServerURL + '/services/examples/deleteall')
+                            .then(function (Response) {
+                                $scope.loadData();
+                            });
+                }
+            })
+</script>
